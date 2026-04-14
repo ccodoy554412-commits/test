@@ -34,5 +34,4 @@ public class gui_test extends JFrame{
         setLocationRelativeTo(null); //puts the screen in the middle of the screen
     }
 
-
 }
