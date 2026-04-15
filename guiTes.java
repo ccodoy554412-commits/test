@@ -2,7 +2,6 @@ package test;
 
 import javax.swing.*;
 public class guiTes extends JFrame{
-
 	public static void main(String[] args) {
 		new guiTes();
 		
@@ -33,5 +32,4 @@ public class guiTes extends JFrame{
 		add(ent).setBounds(150,120,100,25);
 
 	}
-	
 }
