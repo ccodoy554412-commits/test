@@ -22,16 +22,15 @@ public class gui_test extends JFrame{
 
         //backend for the gui
         setSize(500,300); //default size of the frame
-
         setTitle(""); //title bar text
-
         setLayout(null); //this will make us use setBounds for positioning the components
-
         setDefaultCloseOperation(EXIT_ON_CLOSE); //this close/stop the program when the x button is clicked
-
         setVisible(true); //to show the frame
-
         setLocationRelativeTo(null); //puts the screen in the middle of the screen
+
+        but.addActionListener(e->{
+            System.out.println(textf.getText()); //prints the text in the text field to the console when the button is clicked
+        });
     }
 
 }
