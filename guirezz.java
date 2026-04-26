@@ -20,7 +20,7 @@ public class guirezz extends JFrame{
         //frontback
         //txt
         JLabel pn = new JLabel("Pig number");
-        JLabel weights = new JLabel("Weght (Kg):");
+        JLabel weights = new JLabel("Weight (Kg):");
 
         //tf
         JTextField pnt = new JTextField();
@@ -29,6 +29,7 @@ public class guirezz extends JFrame{
         JTextField result = new JTextField("Total Cost");
         result.setEditable(false);
         result.setHorizontalAlignment(JTextField.CENTER);
+
         //buttons
         JButton conf = new JButton("Confirm");
         JButton del = new JButton("Clear");
@@ -55,13 +56,13 @@ public class guirezz extends JFrame{
                 double count = Double.parseDouble(weigh.getText());
                 double cal = count*187;
 
-                result.setText(String.format("\t\t   %.0f₱",cal));
+                result.setText(String.format(" %.0f₱",cal));
                
                 try(FileWriter fw = new FileWriter("Price.txt",true);
                     PrintWriter pw = new PrintWriter(fw)){
-                        pw.printf("\nPig no.: %s \n",pnt.getText());
+                        pw.printf("Pig no.: %s \n",pnt.getText());
                         pw.printf("Weight: %s \n",weigh.getText());
-                        pw.printf("Potential price: %s \n",result.getText());
+                        pw.printf("Potential price: %s \n\n",result.getText());
 
 
                     }catch(IOException ioEx){
