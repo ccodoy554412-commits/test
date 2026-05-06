@@ -54,18 +54,22 @@ public class sirJudCode extends JFrame{
 		JScrollPane scrollpane = new JScrollPane(table);
 		add(scrollpane).setBounds(200,50,460,300);
 
-		
+
+
 		table.addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e) {
 				int row = table.getSelectedRow();
-				if(row!=-1) {
+				if(row != -1) {
 					txtName.setText(model.getValueAt(row,0).toString());
 					txtUPrice.setText(model.getValueAt(row, 1).toString());
 					txtQuantity.setText(model.getValueAt(row, 2).toString());
 					txtTotal.setText(model.getValueAt(row, 3).toString());
 				}
 			}
+
 		});
+
+		read();
 
 		btnAdd.addActionListener(e->{
 
@@ -74,9 +78,7 @@ public class sirJudCode extends JFrame{
 				String name = txtName.getText();
 				double price = Double.parseDouble(txtUPrice.getText());
 				int quantity = Integer.parseInt(txtQuantity.getText());
-
 				double total = price*quantity;
-
 				txtTotal.setText(String.valueOf(total));
 
 				fw.write(name+"#"+price+"#"+quantity+"#"+total+"\n");
@@ -84,6 +86,7 @@ public class sirJudCode extends JFrame{
 
 				JOptionPane.showMessageDialog(null,"Record saved successfully!");
 
+				read();
 
 
 			} catch (IOException x) {
@@ -93,42 +96,95 @@ public class sirJudCode extends JFrame{
 			clear();
 
 		});
-		
+
 		btnDelete.addActionListener(e->{
 			int selectedRow = table.getSelectedRow();
-			
+
 			if(selectedRow == -1) {
-				JOptionPane.showMessageDialog(null,"Select a record to delete");
+				JOptionPane.showMessageDialog(null, "Select a record to delete");
 				return;
 			}
-			
-			int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this record?","Confirm Delete",JOptionPane.YES_NO_OPTION);
-			if(confirm !=JOptionPane.YES_OPTION) return;
-			
+
+			int confirm = JOptionPane.showConfirmDialog(null, "Are you sure to delete this record?","Confirm Delete", JOptionPane.YES_NO_OPTION);
+			if(confirm != JOptionPane.YES_OPTION)return;
+
 			ArrayList<String> lines = new ArrayList<>();
-			
+			try(BufferedReader br = new BufferedReader(new FileReader ("Billing.txt"))){
+				String line;
+				int rowIndex=0;
+				while((line=br.readLine()) !=null) {
+					if(rowIndex !=selectedRow) lines.add(line);
+					rowIndex++;
+				}
+
+			}catch(IOException z) {
+				System.err.println(z);
+			}
+
+			//ArrayList -> File
+			try(BufferedWriter bw = new BufferedWriter (new FileWriter("Billing.txt"))){
+
+				for(String record:lines) bw.write(record+"\n");
+
+			}catch(IOException z) {
+				System.err.println(z);
+			}
+
+			read();
+			JOptionPane.showMessageDialog(null,"Deleted Successfully");
+			clear();
+		});
+		
+		
+		btnUpdate.addActionListener(e->{
+			int selectedRow = table.getSelectedRow();
+			if(selectedRow == -1) {
+				JOptionPane.showMessageDialog(null,"Select a record to Update");
+				return;
+			}
+			//File -> ArrayList
+			ArrayList<String> lines = new ArrayList<>();
 			try(BufferedReader br = new BufferedReader(new FileReader("Billing.txt"))){
 				String line;
-				int rowIndex = 0;
-				while((line = br.readLine()) !=null) {
-					if(rowIndex != selectedRow) lines.add(line);
+				int rowIndex=0;
+				while((line=br.readLine())!=null) {
+					if(rowIndex == selectedRow) {
+						double price = Double.parseDouble(txtUPrice.getText());
+						int quantity = Integer.parseInt(txtQuantity.getText());
+						double total = price*quantity;
+						txtTotal.setText(String.valueOf(total));
+
+						String updatedRecord = txtName.getText() + "#" + txtUPrice.getText() + "#" + txtQuantity.getText() + "#" + txtTotal.getText();
+						
+						lines.add(updatedRecord);
+						
+ 					}else {
+ 						lines.add(line);
+ 					}
 					rowIndex++;
 				}
 				
-			}catch(IOException z) {
-				System.err.println(z);
+			}catch(IOException x) {
+				System.out.println(x);
 			}
-					
 			
+			//ArrayList -> File
 			try(BufferedWriter bw = new BufferedWriter (new FileWriter("Billing.txt"))){
+
 				for(String record:lines) bw.write(record+"\n");
+
 			}catch(IOException z) {
 				System.err.println(z);
 			}
-			
-			JOptionPane.showMessageDialog(null, "Record Deleted");
+
+			read();
+			JOptionPane.showMessageDialog(null,"Updated Successfully");
+			clear();		
 		});
-		
+
+
+	
+
 
 
 		//setUndecorated(true);
@@ -148,5 +204,26 @@ public class sirJudCode extends JFrame{
 		txtQuantity.setText("");
 		txtTotal.setText("");
 	}
-	
+
+	public static void read() {
+		model.setRowCount(0);
+
+		try(BufferedReader br = new BufferedReader(new FileReader("Billing.txt"))){
+			String line;
+			while((line=br.readLine())!=null) {
+				String row[] = line.split("#");
+				model.addRow(row);
+			}
+
+		}catch(IOException e) {
+			System.out.println(e);
+		}
+
+	}
+
+
+	public static void main(String[]args) {
+		new sirJudCode();
+	}
+
 }
