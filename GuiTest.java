@@ -1,5 +1,6 @@
 package test;
 
+import java.io.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 public class GuiTest extends JFrame{
@@ -84,6 +85,62 @@ public class GuiTest extends JFrame{
 		JTable table = new JTable(dtm);
 		JScrollPane jsp = new JScrollPane(table);
 		add(jsp).setBounds(10,170,615,280);
-	}
 
+		load(dtm);
+
+		//listeners
+		add.addActionListener(e->{
+			Object[] row = {
+				gnametxt.getText(),
+				db.getSelectedItem(),
+				gatcha.isSelected()?"Gatcha":"Other",
+				dsptxt.getText(),
+				waste.getText(),
+				statdb.getSelectedItem()
+			};
+			dtm.addRow(row);
+
+			save(dtm);
+
+			gnametxt.setText("");
+			dsptxt.setText("");
+			waste.setText("");
+			
+		});
+	}
+	public static void save(DefaultTableModel dtm){
+		File f = new File("tracker.txt");
+		try(BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
+			for(int i = 0;i<dtm.getRowCount();i++){
+				for(int j = 0;j<dtm.getColumnCount();j++){
+					Object value = dtm.getValueAt(i, j);
+					bw.write(value != null ? value.toString() : "");
+					 if (j < dtm.getColumnCount() - 1) {
+                    bw.write(",");
+                }
+				}
+				bw.newLine();
+			}
+			JOptionPane.showMessageDialog(null, "Table Save Succesfully");
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Error");
+		}
+	}
+	public static void load(DefaultTableModel dtm){
+		File f = new File("Tracker.txt");
+		if(!f.exists()) return;
+
+		try(BufferedReader br = new BufferedReader(new FileReader(f))) {
+			dtm.setRowCount(0);
+			String line;
+
+			while((line = br.readLine()) != null){
+				String[] rowData = line.split(",");
+				dtm.addRow(rowData);
+			}
+
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Error");
+		}
+	}
 }
