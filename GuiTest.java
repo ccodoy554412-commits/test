@@ -1,6 +1,9 @@
 package test;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.*;
+import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 public class GuiTest extends JFrame{
@@ -86,6 +89,19 @@ public class GuiTest extends JFrame{
 		JScrollPane jsp = new JScrollPane(table);
 		add(jsp).setBounds(10,170,615,280);
 
+		//add mouse listener
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e){
+				int row = table.getSelectedRow();
+				if(row != -1){
+					gnametxt.setText(dtm.getValueAt(row, 0).toString());
+					dsptxt.setText(dtm.getValueAt(row, 3).toString());
+					waste.setText(dtm.getValueAt(row, 4).toString());
+				}
+			}
+		});
+
 		load(dtm);
 
 		//listeners
@@ -101,11 +117,56 @@ public class GuiTest extends JFrame{
 			dtm.addRow(row);
 
 			save(dtm);
-
-			gnametxt.setText("");
-			dsptxt.setText("");
-			waste.setText("");
 			
+		});
+		del.addActionListener(e->{
+			int selectedRow = table.getSelectedRow();
+
+			if(selectedRow == -1){
+				JOptionPane.showMessageDialog(null, "Please select a record to delete");
+				return;
+			}
+			int confirm = JOptionPane.showConfirmDialog(null, "Do you conced on deletion?","Confirm delete",JOptionPane.YES_NO_OPTION);
+			if(confirm != JOptionPane.YES_NO_OPTION)return;
+
+			ArrayList<String> lines = new ArrayList<>();
+			try(BufferedReader br = new BufferedReader(new FileReader("tracker.txt"))) {
+				String line;
+				int rowIndex=0;
+				while((line=br.readLine()) != null){
+					if(rowIndex != selectedRow) lines.add(line);
+					rowIndex++;
+				}
+
+			} catch (Exception z) {
+				System.out.println(z);
+			}
+		});
+		updt.addActionListener(e->{
+			int selectedRow = table.getSelectedRow();
+			if(selectedRow == -1){
+				JOptionPane.showMessageDialog(null, "sellect record to update");
+				return;
+			}
+			ArrayList<String> lines = new ArrayList<>();
+			try(BufferedReader br = new BufferedReader(new FileReader("tracker.txt"))) {
+				String line;
+				int rowIndex = 0;
+				while((line=br.readLine())!=null){
+					if(rowIndex == selectedRow){
+						Object[] row={
+							gnametxt.getText(),
+							db.getSelectedItem(),
+							gatcha.isSelected()?"Gatcha":"Other",
+							dsptxt.getText(),
+							waste.getText(),
+							statdb.getSelectedItem()
+						};
+					}
+
+				}
+			} catch (Exception z) {
+			}
 		});
 	}
 	public static void save(DefaultTableModel dtm){
@@ -142,5 +203,8 @@ public class GuiTest extends JFrame{
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Error");
 		}
+	}
+	public static void clear(){
+		
 	}
 }
